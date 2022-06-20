@@ -1,63 +1,40 @@
-
 '''
-{"query":
-{
-  "span_near": {
-    "clauses": [
-      {
-        "span_multi": {
-          "match": {
-            "fuzzy": {
-              "content": {
-                "fuzziness": "2",
-                "value": "word"
-              }
-            }
-          }
-        }
-      },
-      {
-        "span_multi": {
-          "match": {
-            "fuzzy": {
-              "content": {
-                "fuzziness": "2",
-                "value": "another"
-              }
-            }
-          }
-        }
-      }
-    ],
-    "slop": 1,
-    "in_order": "true"
-  }
-}
-
+    build query:
+        1. phrase match
+        2. multi clause blocks
+        3. optional fuzziness per term
+        4. optional terms slope in the context of a multi search
+        5. terms in order switch
+        6. whatever
 '''
-
 import sys
 import json
-import pprint
-from collections import defaultdict
+
+
+def build_term(term, field_name, fuzziness):
+    query = {"span_multi":
+        {"match":
+            {"fuzzy":
+                {field_name: {
+                    "fuzziness": fuzziness,
+                    "value": term
+                }
+                }
+            }
+        }
+    }
+
+    return json.dumps(query)
+
 
 def build_query(terms):
-    nested_dict = lambda: defaultdict(nested_dict)
-    query=nested_dict()
-    query['span_near']['clauses']=list()
-    query['slop']='1'
-    query['in_order']="true"
+    clouse = []
+    for term in terms:
+        term_block = build_term(term=term, field_name='text', fuzziness=3)
+        clouse.append(term_block)
+    return clouse
 
-    for w in terms:
-        nest = nested_dict()
-        nest["span_multi"]["match"]["fuzzy"]["msg"]["fuzziness"]["value"]=w
-        nest["span_multi"]["match"]["fuzzy"]["msg"]["fuzziness"]["fuzziness"]="2"
-        json.dumps(nest)
-        query['span_near']['clauses'].append(json.loads(json.dumps(nest)))
 
-    pprint.pprint(json.loads(json.dumps(query)))
-
-    return query
 
 if __name__ == '__main__':
 
@@ -65,7 +42,8 @@ if __name__ == '__main__':
         print(f'usage: python {sys.argv[0]} <terms>')
         exit(1)
 
-    terms = sys.argv[:]
-    print(f'build span multi query from: {terms}')
-    build_query(terms=terms)
+    terms = sys.argv[1:]
 
+    print(f'build span multi query from: {terms}')
+    query = build_query(terms=terms)
+    print(query)

@@ -1,0 +1,44 @@
+
+
+span_multi_query = {"query":
+                        {"span_near": {
+                            "clauses": [
+                                {"span_multi":
+                                    {"match":
+                                        {"fuzzy":
+                                            {"text":
+                                                {"fuzziness": 2,
+                                                 "value": "netore"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                {"span_multi":
+                                    {"match":
+                                        {"fuzzy":
+                                            {"text":
+                                                {"fuzziness": 2,
+                                                "value": "simple"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                {"span_multi":
+                                    {"match":
+                                        {"fuzzy":
+                                            {"text":
+                                                {"fuzziness": 2,
+                                                "value": "speed"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ],
+                            "slop": "1",
+                            "in_order": false
+                            }
+                        }
+                    }
